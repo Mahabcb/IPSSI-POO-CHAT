@@ -2,55 +2,12 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-
-
 use App\Entity\User;
 use App\Entity\Message;
-// ajouter une variable $error qui contient un tableau vide
 
-  // AFFICHAQUE DES MESSAGES
-  $sql_all_message = "SELECT author, content, created_at FROM message ORDER BY created_at DESC";
-  $pdo = new PDO('mysql:host=localhost;dbname=chat', 'root', 'root',[
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-  ]);
-  $result = $pdo->query($sql_all_message);
-  $messages = $result->fetchAll();
-
- // INSERTION DES DONNEES DANS LA BDD
- if($_SERVER["REQUEST_METHOD"] == "POST"){
-  if(!empty($_POST['name']) and !empty($_POST['message']) and strlen($_POST['message'] > 3) )
-  {
-    $pdo = new PDO('mysql:host=localhost;dbname=chat', 'root', 'root',[
-      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
-
-    $user = new User;
-    $user->setName($_POST['name']);
-    $message = new Message;
-    $message->setContent($_POST['message'])
-            ->setAuthor($user);
-
-    $query_user = $pdo->prepare("INSERT INTO user (name) VALUES (:name)");
-    $query_user->execute([
-      'name' => $user->getName()
-    ]);
-
-    $query_message = $pdo->prepare("INSERT INTO message (content, author, created_at) VALUES (:content, :author, :created_at)");
-    $query_message->execute([
-      'content' => $message->getContent(),
-      'author' => $user->getName(),
-      'created_at' => $message->getCreatedAt()->format("Y-m-d H:i:s")
-    ]);
-    header('Location: index.php');
-    exit;
-  }
-
-  // $messageController = new MessageController;
-  // $messages = $messageController->getMessages();
-  // $messageController->handleRequest();
-}
+$messageController = new App\Controller\MessageController();
+$messages = $messageController->getMessages();
+$messageController->handleRequest();
 ?>
 <!DOCTYPE html>
 <html>

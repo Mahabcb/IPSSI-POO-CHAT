@@ -1,5 +1,13 @@
 <?php
 
+$connection = mysqli_connect('localhost', 'root', 'root', );
+$sql_db = "CREATE DATABASE IF NOT EXISTS chat";
+
+if(!mysqli_query($connection, $sql_db)) {
+    echo 'Error creating database : ' . mysqli_error($connection);
+}else{
+    echo 'Database created successfully' . PHP_EOL;
+}
 
 $connection = mysqli_connect('localhost', 'root', 'root', 'chat');
 

@@ -9,18 +9,14 @@ class MessageController{
      *          lire les messages
      *          supprimer un message
      */ 
-     public function findAllMessage()
-     {
-
-     }
-
-     public function findMessageById($id)
-     {
-
-     }
      
-     public function addMessages()
+     // verification des données
+     public function handleRequest()
      {
 
+     }
+
+     public function getMessages()
+     {
      }
 }

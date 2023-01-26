@@ -9,21 +9,22 @@ use App\Entity\Message;
 // ajouter une variable $error qui contient un tableau vide
 
   // AFFICHAQUE DES MESSAGES
-  $connection = mysqli_connect('localhost', 'root', 'root', 'chat');
   $sql_all_message = "SELECT author, content, created_at FROM message ORDER BY created_at DESC";
-  $result = mysqli_query($connection, $sql_all_message);
-  $messages = mysqli_fetch_all($result, MYSQLI_ASSOC);
-  mysqli_close($connection);
-
+  $pdo = new PDO('mysql:host=localhost;dbname=chat', 'root', 'root',[
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+  ]);
+  $result = $pdo->query($sql_all_message);
+  $messages = $result->fetchAll();
 
  // INSERTION DES DONNEES DANS LA BDD
  if($_SERVER["REQUEST_METHOD"] == "POST"){
   if(!empty($_POST['name']) and !empty($_POST['message']) and strlen($_POST['message'] > 3) )
   {
-    $connection =  mysqli_connect('localhost', 'root', 'root', 'chat');
-    if(!$connection) {
-      die('Connection failed: ' . mysqli_connect_error());
-    }
+    $pdo = new PDO('mysql:host=localhost;dbname=chat', 'root', 'root',[
+      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+      PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]);
 
     $user = new User;
     $user->setName($_POST['name']);
@@ -31,21 +32,18 @@ use App\Entity\Message;
     $message->setContent($_POST['message'])
             ->setAuthor($user);
 
-    $sql_user = "INSERT INTO user (name) VALUES ('" . $user->getName() . "')";
-    $sql_message =  "INSERT INTO message (content, author, created_at) VALUES ('" . $message->getContent() . "', '" . $user->getName() . "', '" . $message->getCreatedAt()->format("Y-m-d H:i:s") . "')";
-    if (mysqli_query($connection, $sql_user)) {
-      echo "New record for table user created successfully";
-    } else {
-      echo "Error: " . $sql_user . "<br>" . mysqli_error($connection);
-    }
+    $query_user = $pdo->prepare("INSERT INTO user (name) VALUES (:name)");
+    $query_user->execute([
+      'name' => $user->getName()
+    ]);
 
-    if (mysqli_query($connection, $sql_message)) {
-      echo "New record for table message created successfully";
-    } else {
-      echo "Error: " . $sql_message . "<br>" . mysqli_error($connection);
-    }
-    mysqli_close($connection);
-    header('Location: /');
+    $query_message = $pdo->prepare("INSERT INTO message (content, author, created_at) VALUES (:content, :author, :created_at)");
+    $query_message->execute([
+      'content' => $message->getContent(),
+      'author' => $user->getName(),
+      'created_at' => $message->getCreatedAt()->format("Y-m-d H:i:s")
+    ]);
+    header('Location: index.php');
     exit;
   }
 

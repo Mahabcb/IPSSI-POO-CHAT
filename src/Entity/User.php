@@ -10,7 +10,7 @@ class User{
 
     public function __construct()
     {
-        $this->id = rand(1, 100);
+        $this->id = rand(1, 1000);
     }
 
     public function getId()

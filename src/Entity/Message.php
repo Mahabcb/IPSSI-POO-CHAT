@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+namespace App\Entity;
+
+use DateTime;
 use App\Entity\User;
 
 class Message{
@@ -9,6 +12,12 @@ class Message{
     private User $author;
     private string $content;
     private DateTime $createdAt;
+
+    public function __construct()
+    {
+        $this->id = rand(1, 1000);
+        $this->createdAt = new DateTime("Europe/Paris");
+    }
 
     public function getId() : ?int
     {

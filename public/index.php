@@ -14,11 +14,11 @@
         <form id="form-message" method="post">
           <div class="mb-4">
             <label class="block text-gray-700 font-medium mb-2" for="name">Nom</label>
-            <input class="bg-gray-200 p-2 rounded-lg w-full" type="text" id="name" name="name" required>
+            <input class="bg-gray-200 p-2 rounded-lg w-full" type="text" id="name" name="name" >
           </div>
           <div class="mb-4">
             <label class="block text-gray-700 font-medium mb-2" for="message">Message</label>
-            <textarea class="bg-gray-200 p-2 rounded-lg w-full" id="message" name="message" required></textarea>
+            <textarea class="bg-gray-200 p-2 rounded-lg w-full" id="message" name="message" ></textarea>
           </div>
           <div class="text-center">
             <button class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">Envoyer</button>
@@ -28,6 +28,8 @@
       
       <div class="bg-white p-6 rounded-lg shadow-md mt-10" id="messages">
         <h2 class="text-lg font-medium mb-4">Messages</h2>
+        <?php foreach() ?>
+          <?php endforeach ?>
         <ul class="list-none">
 
         </ul>
@@ -37,15 +39,45 @@
 </html>
 
 <?php
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
-/**
- * #. se connecter a la base de donnée
- * # récuperer les informations posté dans $_POST
- * #. vérifier que les informations sont valides selon les règles de validation (nom >3, message > 4)
- * récupérer message et user dans une instace de Message et de user
- * inserer le message dans la base de donnée
- * insérer le user dans la base de donnée
- */
 
+
+use App\Entity\User;
+use App\Entity\Message;
+// ajouter une variable $error qui contient un tableau vide
+
+ if($_SERVER["REQUEST_METHOD"] == "POST"){
+  if(!empty($_POST['name']) and !empty($_POST['message']) and strlen($_POST['message'] > 3) )
+  {
+    $connection =  mysqli_connect('localhost', 'root', 'root', 'chat');
+    if(!$connection) {
+      die('Connection failed: ' . mysqli_connect_error());
+    }
+
+    $user = new User;
+    $user->setName($_POST['name']);
+    $message = new Message;
+    $message->setContent($_POST['message'])
+            ->setAuthor($user);
+
+    $sql_user = "INSERT INTO user (name) VALUES ('" . $user->getName() . "')";
+    $sql_message =  "INSERT INTO message (content, author, created_at) VALUES ('" . $message->getContent() . "', '" . $user->getName() . "', '" . $message->getCreatedAt()->format("Y-m-d H:i:s") . "')";
+    if (mysqli_query($connection, $sql_user)) {
+      echo "New record for table user created successfully";
+    } else {
+      echo "Error: " . $sql_user . "<br>" . mysqli_error($connection);
+    }
+
+    if (mysqli_query($connection, $sql_message)) {
+      echo "New record for table message created successfully";
+    } else {
+      echo "Error: " . $sql_message . "<br>" . mysqli_error($connection);
+    }
+    mysqli_close($connection);
+    header('Location: /');
+    exit;
+  }
+}
 ?>

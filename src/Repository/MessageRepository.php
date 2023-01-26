@@ -55,4 +55,13 @@ class MessageRepository extends QueryBuilder{
             'created_at' => $created_at
         ]);
     }
+
+    public function removeMessage()
+    {
+        $sql = "DELETE FROM message WHERE id = :id";
+        $query = $this->connection->prepare($sql);
+        $query->execute([
+            'id' => $_GET['id']
+        ]);
+    }
 }

@@ -3,30 +3,12 @@ declare(strict_types=1);
 
 namespace   App\Entity;
 
-class User{
-    
-    private int $id;
-    private string $name;
+use App\Entity\AbstractEntity\AbstractUser;
 
+class User extends AbstractUser{
+   
     public function __construct()
     {
-        $this->id = rand(1, 1000);
+        parent::__construct();
     }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-    
-    public function getName() : ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name) : self
-    {
-        $this->name = $name;
-        return $this;
-    }
-
 }
